@@ -1,3 +1,7 @@
+# Author: Jack Ellingwood
+# Date: 11/18/25
+# Assignment: COS226 HW 5: Hash Something Out 
+
 from csv import reader
 import sys
 import time
@@ -23,10 +27,18 @@ class HashTable():
         self.collisions = 0
 
     def store(self, value: DataItem):
-        # TODO currently does not handle collisions
         key = self._hash(value.movieName)
         if self.table[key] != None:
             self.collisions += 1
+        
+        originalKey = key
+        while self.table[key]: # loops through filled slots
+            key += 1
+            if key == self.length:
+                key = 0
+            if key == originalKey:
+                return "No more space, cannot store new value."
+
         self.table[key] = value
 
     def retrieve(self, strKey: str) -> DataItem:
@@ -44,15 +56,18 @@ class HashTable():
 
 
 def main():
-    titletable = HashTable(15000)
+    titleTable = HashTable(15000)
+    start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
         for row in reader(f):
-            titletable.store(DataItem(row))
-    print("Time taken (s):", (time.time_ns() - start) / 10**9)
-    print("Collisions:", titletable.collisions)
-    print("Wasted slots:", titletable.get_empty_slots())
-    # print([movie.movieName if movie else None for movie in titletable.table])
+            titleTable.store(DataItem(row))
+        end = time.time_ns() - start
+    print([movie.movieName if movie else None for movie in titleTable.table])
+    print()
+    print("Time taken (s):", end / 10**9)
+    print("Collisions:", titleTable.collisions)
+    print("Wasted slots:", titleTable.get_empty_slots())
 
 
 if __name__ == "__main__":
