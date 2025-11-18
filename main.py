@@ -59,7 +59,7 @@ class HashTable():
     def _hash(self, data):
         key = 0
         for c in data:
-            key += ord(c)
+            key += ord(c) * 4999
             # key %= sys.maxsize # perhaps not necessary as python can handle numbers above sys.maxsize
         return key % self.length
     
@@ -68,7 +68,7 @@ class HashTable():
 
 
 def main():
-    titleTable = HashTable(15000)
+    titleTable = HashTable(16000)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -81,7 +81,7 @@ def main():
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
-    print(titleTable.retrieve('Journey to the Center of the Earth').genre)
+    print(titleTable.retrieve('South of Heaven, West of Hell').genre)
 
 
 if __name__ == "__main__":
