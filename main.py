@@ -34,15 +34,27 @@ class HashTable():
         originalKey = key
         while self.table[key]: # loops through filled slots
             key += 1
-            if key == self.length:
+            if key == self.length: # wrap key around if necessary
                 key = 0
-            if key == originalKey:
+            if key == originalKey: # traversed whole list
                 return "No more space, cannot store new value."
 
         self.table[key] = value
 
     def retrieve(self, strKey: str) -> DataItem:
-        pass
+        key = self._hash(strKey)
+
+        originalKey = key
+        while self.table[key]: # loops through filled slots 
+            if self.table[key].movieName == strKey: # TODO how to do this for any attribute of DataItem?
+                return self.table[key] # found it!
+            key += 1
+            if key == self.length: # wrap key around if necessary
+                key = 0
+            if key == originalKey: # traversed whole list
+                return None
+            
+        return None # met with a None, the item is not here
 
     def _hash(self, data):
         key = 0
@@ -60,14 +72,16 @@ def main():
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
-        for row in reader(f):
+        for row in list(reader(f))[1:]: # skip initial variables line
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
-    print([movie.movieName if movie else None for movie in titleTable.table])
+    
+    # print([movie.movieName if movie else None for movie in titleTable.table])
     print()
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
-    print("Wasted slots:", titleTable.get_empty_slots())
+    print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
+    print(titleTable.retrieve('Journey to the Center of the Earth').genre)
 
 
 if __name__ == "__main__":
