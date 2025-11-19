@@ -3,8 +3,21 @@
 # Assignment: COS226 HW 5: Hash Something Out 
 
 from csv import reader
+from enum import Enum
 import sys
 import time
+
+
+class DataType(Enum):
+    movieName = 0
+    genre = 1
+    releaseDate = 2
+    director = 3
+    revenue = 4
+    rating = 5
+    durationMins = 6
+    productionCompany = 7
+    quote = 8
 
 
 class DataItem:
@@ -21,13 +34,18 @@ class DataItem:
 
 
 class HashTable():
-    def __init__(self, length: int):
+    def __init__(self, length: int, indexBy: DataType = DataType.movieName):
         self.length = length
-        self.table = [None] * length
+        self.indexBy = indexBy
+        self.table: list[DataItem] = [None] * length
         self.collisions = 0
 
     def store(self, value: DataItem):
-        key = self._hash(value.movieName)
+        if self.indexBy == DataType.movieName:
+            key = self._hash(value.movieName)
+        elif self.indexBy == DataType.quote:
+            key = self._hash(value.quote)
+
         if self.table[key] != None:
             self.collisions += 1
         
@@ -43,11 +61,14 @@ class HashTable():
 
     def retrieve(self, strKey: str) -> DataItem:
         key = self._hash(strKey)
-
         originalKey = key
         while self.table[key]: # loops through filled slots 
-            if self.table[key].movieName == strKey: # TODO how to do this for any attribute of DataItem?
-                return self.table[key] # found it!
+            if self.indexBy == DataType.movieName:
+                if self.table[key].movieName == strKey:
+                    return self.table[key] # found it!
+            elif self.indexBy == DataType.quote:
+                if self.table[key].quote == strKey:
+                    return self.table[key] # found it!
             key += 1
             if key == self.length: # wrap key around if necessary
                 key = 0
@@ -68,7 +89,7 @@ class HashTable():
 
 
 def main():
-    titleTable = HashTable(16000)
+    titleTable = HashTable(16000, DataType.movieName)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -77,11 +98,10 @@ def main():
         end = time.time_ns() - start
     
     # print([movie.movieName if movie else None for movie in titleTable.table])
-    print()
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
-    print(titleTable.retrieve('South of Heaven, West of Hell').genre)
+    print(titleTable.retrieve('Babes in Toyland').movieName)
 
 
 if __name__ == "__main__":
