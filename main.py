@@ -33,11 +33,17 @@ class DataItem:
         self.quote = line[8]
 
 
+class LinkedNode:
+    def __init__(self, data: DataItem):
+        self.data: DataItem = data
+        self.next: LinkedNode = None
+
+
 class HashTable():
     def __init__(self, length: int, indexBy: DataType = DataType.movieName):
         self.length = length
         self.indexBy = indexBy
-        self.table: list[DataItem] = [None] * length
+        self.table: list[LinkedNode] = [None] * length
         self.collisions = 0
 
     def store(self, value: DataItem):
@@ -46,36 +52,34 @@ class HashTable():
         elif self.indexBy == DataType.quote:
             key = self._hash(value.quote)
 
-        if self.table[key] != None:
+        if self.table[key] == None:
+            self.table[key] = LinkedNode(value)
+        else:
             self.collisions += 1
-        
-        originalKey = key
-        while self.table[key]: # loops through filled slots
-            key += 1
-            if key == self.length: # wrap key around if necessary
-                key = 0
-            if key == originalKey: # traversed whole list
-                return "No more space, cannot store new value."
 
-        self.table[key] = value
+            curNode = self.table[key]
+            while curNode.next:
+                curNode = curNode.next
 
-    def retrieve(self, strKey: str) -> DataItem:
-        key = self._hash(strKey)
-        originalKey = key
-        while self.table[key]: # loops through filled slots 
-            if self.indexBy == DataType.movieName:
-                if self.table[key].movieName == strKey:
-                    return self.table[key] # found it!
-            elif self.indexBy == DataType.quote:
-                if self.table[key].quote == strKey:
-                    return self.table[key] # found it!
-            key += 1
-            if key == self.length: # wrap key around if necessary
-                key = 0
-            if key == originalKey: # traversed whole list
-                return None
+            curNode.next = LinkedNode(value)
+
+    # def retrieve(self, strKey: str) -> DataItem: #retrieval not required
+    #     key = self._hash(strKey)
+    #     originalKey = key
+    #     while self.table[key]: # loops through filled slots 
+    #         if self.indexBy == DataType.movieName:
+    #             if self.table[key].movieName == strKey:
+    #                 return self.table[key] # found it!
+    #         elif self.indexBy == DataType.quote:
+    #             if self.table[key].quote == strKey:
+    #                 return self.table[key] # found it!
+    #         key += 1
+    #         if key == self.length: # wrap key around if necessary
+    #             key = 0
+    #         if key == originalKey: # traversed whole list
+    #             return None
             
-        return None # met with a None, the item is not here
+    #     return None # met with a None, the item is not here
 
     def _hash(self, data):
         key = 0
@@ -91,7 +95,7 @@ class HashTable():
 def main():
     print()
 
-    titleTable = HashTable(16000, DataType.movieName)
+    titleTable = HashTable(5000, DataType.movieName)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -99,14 +103,14 @@ def main():
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 1, Title")
+    print("Optimization 2, Title")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
 
     print()
 
-    quoteTable = HashTable(16000, DataType.quote)
+    quoteTable = HashTable(5000, DataType.quote)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -114,7 +118,7 @@ def main():
             quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 1, Quote")
+    print("Optimization 2, Quote")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", quoteTable.collisions)
     print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
