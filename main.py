@@ -106,18 +106,18 @@ def main():
 
     print()
 
-    titleTable = HashTable(16000, DataType.quote)
+    quoteTable = HashTable(16000, DataType.quote)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
         for row in list(reader(f))[1:]: # skip initial variables line
-            titleTable.store(DataItem(row))
+            quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
     print("Optimization 1, Quote")
     print("Time taken (s):", end / 10**9)
-    print("Collisions:", titleTable.collisions)
-    print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
+    print("Collisions:", quoteTable.collisions)
+    print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
 
     print()    
 
