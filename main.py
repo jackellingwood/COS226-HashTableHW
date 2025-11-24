@@ -8,7 +8,7 @@ import sys
 import time
 
 
-class DataType(Enum):
+class DataType(Enum): # datatype enum as comparison by string seemed to slow down the store function
     movieName = 0
     genre = 1
     releaseDate = 2
@@ -52,6 +52,7 @@ class HashTable():
         elif self.indexBy == DataType.quote:
             key = self._hash(value.quote)
 
+        # linkedNode approach, create linkedNode if one doesn't exist in slot or append to end of list
         if self.table[key] == None:
             self.table[key] = LinkedNode(value)
         else:
@@ -81,7 +82,7 @@ class HashTable():
             
     #     return None # met with a None, the item is not here
 
-    def _hash(self, data):
+    def _hash(self, data): # djb2 hash, from http://www.cse.yorku.ca/~oz/hash.html
         key = 5381
         for c in data:
             key = key * 33 + ord(c)
