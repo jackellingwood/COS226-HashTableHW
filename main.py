@@ -37,6 +37,7 @@ class LinkedNode:
     def __init__(self, data: DataItem):
         self.data: DataItem = data
         self.next: LinkedNode = None
+        self.last: LinkedNode = self
 
 
 class HashTable():
@@ -58,11 +59,11 @@ class HashTable():
         else:
             self.collisions += 1
 
+            # hopefully this makes it so that we do not have to traverse an entire linked list to find our last value
             curNode = self.table[key]
-            while curNode.next:
-                curNode = curNode.next
+            curNode.last.next = LinkedNode(value)
+            curNode.last = curNode.last.next
 
-            curNode.next = LinkedNode(value)
 
     # def retrieve(self, strKey: str) -> DataItem: #retrieval not required
     #     key = self._hash(strKey)
@@ -104,7 +105,7 @@ def main():
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 3, Title")
+    print("Optimization 4, Title")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
@@ -119,7 +120,7 @@ def main():
             quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 3, Quote")
+    print("Optimization 4, Quote")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", quoteTable.collisions)
     print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
