@@ -82,9 +82,9 @@ class HashTable():
     #     return None # met with a None, the item is not here
 
     def _hash(self, data):
-        key = 0
+        key = 5381
         for c in data:
-            key += ord(c) * 4999
+            key = key * 33 + ord(c)
             # key %= sys.maxsize # perhaps not necessary as python can handle numbers above sys.maxsize
         return key % self.length
     
@@ -95,7 +95,7 @@ class HashTable():
 def main():
     print()
 
-    titleTable = HashTable(5000, DataType.movieName)
+    titleTable = HashTable(15000, DataType.movieName)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -103,14 +103,14 @@ def main():
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 2, Title")
+    print("Optimization 3, Title")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
 
     print()
 
-    quoteTable = HashTable(5000, DataType.quote)
+    quoteTable = HashTable(15000, DataType.quote)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -118,7 +118,7 @@ def main():
             quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 2, Quote")
+    print("Optimization 3, Quote")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", quoteTable.collisions)
     print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
