@@ -85,6 +85,8 @@ class HashTable():
 
     def _hash(self, data): # djb2 hash, from http://www.cse.yorku.ca/~oz/hash.html
         key = 5381
+        if len(data) > 500: # if data is extraordinarily long (cough cough bee movie) just do one unique operation on it
+            return len(data) * 33 % self.length
         for c in data:
             key = key * 33 + ord(c)
             # key %= sys.maxsize # perhaps not necessary as python can handle numbers above sys.maxsize
@@ -105,7 +107,7 @@ def main():
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 4, Title")
+    print("Optimization 5, Title")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
@@ -120,7 +122,7 @@ def main():
             quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 4, Quote")
+    print("Optimization 5, Quote")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", quoteTable.collisions)
     print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
