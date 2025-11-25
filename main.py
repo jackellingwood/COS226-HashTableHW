@@ -46,6 +46,7 @@ class HashTable():
         self.table: list[LinkedNode] = [None] * length
         self.collisions = 0
 
+    # store value at its hash or next available spot in linkedlist, can hash by either quote or title depending on self.indexBy
     def store(self, value: DataItem):
         if self.indexBy == DataType.movieName:
             key = self._hash(value.movieName)
