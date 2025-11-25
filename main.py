@@ -47,7 +47,9 @@ class HashTable():
         self.table: list[LinkedNode] = [None] * length
         self.collisions = 0
 
+    # adds a value to our hashTable, hashes by indexBy given at __init__
     def store(self, value: DataItem):
+        # to allow sorting by different data types
         if self.indexBy == DataType.movieName:
             key = self._hash(value.movieName)
         elif self.indexBy == DataType.quote:
