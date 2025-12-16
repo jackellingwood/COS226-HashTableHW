@@ -33,38 +33,31 @@ class DataItem:
         self.quote = line[8]
 
 
-class LinkedNode:
-    def __init__(self, data: DataItem):
-        self.data: DataItem = data
-        self.next: LinkedNode = None
-        self.last: LinkedNode = self
-
-
 class HashTable():
     def __init__(self, length: int, indexBy: DataType = DataType.movieName):
         self.length = length
         self.indexBy = indexBy
-        self.table: list[LinkedNode] = [None] * length
+        self.table: list[DataItem] = [None] * length
         self.collisions = 0
 
-    # adds a value to our hashTable, hashes by indexBy given at __init__
     def store(self, value: DataItem):
-        # to allow sorting by different data types
         if self.indexBy == DataType.movieName:
             key = self._hash(value.movieName)
         elif self.indexBy == DataType.quote:
             key = self._hash(value.quote)
 
-        # linkedNode approach, create linkedNode if one doesn't exist in slot or append to end of list
-        if self.table[key] == None:
-            self.table[key] = LinkedNode(value)
-        else:
+        if self.table[key] != None:
             self.collisions += 1
+        
+        originalKey = key
+        while self.table[key]: # loops through filled slots
+            key += 1
+            if key == self.length: # wrap key around if necessary
+                key = 0
+            if key == originalKey: # traversed whole list
+                return "No more space, cannot store new value."
 
-            # hopefully this makes it so that we do not have to traverse an entire linked list to find our last value
-            curNode = self.table[key]
-            curNode.last.next = LinkedNode(value)
-            curNode.last = curNode.last.next
+        self.table[key] = value
 
 
     # def retrieve(self, strKey: str) -> DataItem: #retrieval not required
@@ -101,7 +94,7 @@ class HashTable():
 def main():
     print()
 
-    titleTable = HashTable(15000, DataType.movieName)
+    titleTable = HashTable(16000, DataType.movieName)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -109,14 +102,14 @@ def main():
             titleTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 5, Title")
+    print("Optimization 5b, Title")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", titleTable.collisions)
     print("Wasted slots:", titleTable.get_empty_slots(), "/", titleTable.length)
 
     print()
 
-    quoteTable = HashTable(15000, DataType.quote)
+    quoteTable = HashTable(16000, DataType.quote)
     start = end = 0
     with open("MOCK_DATA.csv", encoding="UTF-8") as f:
         start = time.time_ns()
@@ -124,7 +117,7 @@ def main():
             quoteTable.store(DataItem(row))
         end = time.time_ns() - start
 
-    print("Optimization 5, Quote")
+    print("Optimization 5b, Quote")
     print("Time taken (s):", end / 10**9)
     print("Collisions:", quoteTable.collisions)
     print("Wasted slots:", quoteTable.get_empty_slots(), "/", quoteTable.length)
